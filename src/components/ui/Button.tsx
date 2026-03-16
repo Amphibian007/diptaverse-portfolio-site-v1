@@ -1,12 +1,30 @@
-import type { ButtonHTMLAttributes } from "react";
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
+} from "react";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type BaseButtonProps = {
+  children: ReactNode;
+  className?: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
 };
+
+type NativeButtonProps = BaseButtonProps &
+  ButtonHTMLAttributes<HTMLButtonElement> & {
+    href?: undefined;
+  };
+
+type AnchorButtonProps = BaseButtonProps &
+  AnchorHTMLAttributes<HTMLAnchorElement> & {
+    href: string;
+  };
+
+type ButtonProps = NativeButtonProps | AnchorButtonProps;
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
@@ -26,6 +44,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 export function Button({
   children,
   className,
+  href,
   size = "md",
   type = "button",
   variant = "primary",
@@ -42,6 +61,14 @@ export function Button({
   ]
     .filter(Boolean)
     .join(" ");
+
+  if (href) {
+    return (
+      <a className={classes} href={href} {...props}>
+        {children}
+      </a>
+    );
+  }
 
   return (
     <button className={classes} type={type} {...props}>
